@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:learning_provider/remote_bloc.dart';
+import 'package:learning_provider/remote_event.dart';
+import 'package:learning_provider/remote_state.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -16,7 +19,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Scaffold(body: GrandWidget()),
+        home: Scaffold(body: TextBloc()),
       ),
     );
   }
@@ -137,5 +140,60 @@ class DataProvider with ChangeNotifier {
   void increment() {
     _counter++;
     notifyListeners();
+  }
+}
+
+class TextBloc extends StatefulWidget {
+  @override
+  _TextBlocState createState() => _TextBlocState();
+}
+
+class _TextBlocState extends State<TextBloc> {
+  final remoteBloc = RemoteBloc();
+  @override
+  Widget build(BuildContext context) {
+    print("==> render scaffold");
+    return Scaffold(
+      body: StreamBuilder(
+          initialData: remoteBloc.state,
+          stream: remoteBloc.stateController.stream,
+          builder: (BuildContext context, AsyncSnapshot<RemoteState> snapshot) {
+            print("==> render build context");
+            return Center(
+                child: Text(
+              "Current volumns is: ${snapshot.data.volumn}",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ));
+          }),
+      floatingActionButton: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            onPressed: () {
+              remoteBloc.eventController.sink.add(IncreaseVolumn(2));
+            },
+            child: Text("+"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              remoteBloc.eventController.sink.add(DecreaseVolumn(2));
+            },
+            child: Text("-"),
+          ),
+          FloatingActionButton(
+            onPressed: () {
+              remoteBloc.eventController.sink.add(MuteVolumn());
+            },
+            child: Text("Mute"),
+          )
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    this.remoteBloc.dispose();
   }
 }

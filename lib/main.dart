@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:learning_provider/counterapp/counter_bloc.dart';
+import 'package:learning_provider/counterapp/counter_page.dart';
 import 'package:learning_provider/remote_bloc.dart';
 import 'package:learning_provider/remote_event.dart';
 import 'package:learning_provider/remote_state.dart';
@@ -19,7 +22,8 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: Scaffold(body: TextBloc()),
+        home: BlocProvider(
+            create: (context) => CounterBloc(), child: CounterApp()),
       ),
     );
   }
